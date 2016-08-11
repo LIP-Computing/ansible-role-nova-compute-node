@@ -1,0 +1,44 @@
+---
+# tasks file for nova compute
+
+# Prerequisites
+
+
+# Install and configure
+- name: Install OpenStack nova packages.
+  yum: name={{ item }} state=installed
+  with_items:
+    - openstack-nova-compute
+    - sysfsutils
+
+- name: Deploy nova configuration files from templates
+  template: src={{ item.src }} dest={{ item.dest }} backup=yes
+  with_items:
+    - { src: 'nova/nova.conf.j2', dest: '/etc/nova/nova.conf' }
+  notify: restart nova
+  # my_ip = 10.0.0.31
+
+- name: Check not support hardware acceleration.
+  shell: egrep -c '(vmx|svm)' /proc/cpuinfo
+  register: result
+  run_once: True
+
+- name: Configure libvirt to use QEMU instead of KVM
+  when: register.stdout ==0
+   lineinfile: >
+    dest='/etc/nova/nova.conf'
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: "^#?virt_type", line: "virt_type = qemu" }
+
+- name: Give permissions to /var/log/nova/nova.log
+  file: path=/var/log/nova/nova.log state=touch mode=0640 owner=nova group=apache
+
+
+- name: Ensure nova service is started and enabled on boot.
+  service: name={{ item }} enabled=yes state=started
+  with_items:
+    - libvirtd
+    - openstack-nova-compute

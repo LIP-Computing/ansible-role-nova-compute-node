@@ -1,0 +1,16 @@
+---
+# defaults file for ansible-role-nova-compute-node
+# rabbitmq variables
+openstack_version: "liberty"
+openstack_controller_host: localhost
+openstack_ip: 10.0.0.31
+
+openstack_rabbit_host: localhost
+openstack_rabbit_user: openstack
+openstack_rabbit_pass: 12345
+
+openstack_os_identity_api_version: "3"
+openstack_ath_uri: "http://{{ openstack_admin_vip }}:5000"
+openstack_ath_url: "http://{{ openstack_admin_vip }}:35357"
+
+openstack_nova_keystone_password: "openstack"
