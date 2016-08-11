@@ -3053,6 +3053,16 @@ password = {{ openstack_nova_keystone_password }}
 
 
 [neutron]
+url = http://{{ openstack_controller_host }}:9696
+auth_url = {{ openstack_ath_url }}
+auth_plugin = password
+project_domain_id = default
+user_domain_id = default
+region_name = {{ openstack_keystone_auth_region }}
+project_name = service
+username = neutron
+password = {{ openstack_neutron_keystone_password }}
+
 #
 # Options defined in nova.api.metadata.handler
 #

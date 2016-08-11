@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  vars:
+    openstack_version: "liberty"
+    openstack_controller_host: localhost
+    openstack_ip: 10.0.0.31
+
+  roles:
+    - ansible-role-nova-compute-node

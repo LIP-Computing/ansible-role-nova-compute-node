@@ -14,3 +14,5 @@ openstack_ath_uri: "http://{{ openstack_admin_vip }}:5000"
 openstack_ath_url: "http://{{ openstack_admin_vip }}:35357"
 
 openstack_nova_keystone_password: "openstack"
+openstack_neutron_keystone_password: "openstack"
+openstack_keystone_auth_region: RegionOne
