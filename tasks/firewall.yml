@@ -1,0 +1,8 @@
+---
+- name: Copy iptables configuration
+  template: src={{ item.src }} dest={{ item.dest }} backup=yes
+  with_items:
+    - { src: 'iptables.j2', dest: '/etc/sysconfig/iptables' }
+
+- name: Restart services
+  service: name=iptables enabled=yes state=restarted

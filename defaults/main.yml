@@ -3,7 +3,9 @@
 # rabbitmq variables
 openstack_version: "liberty"
 openstack_controller_host: localhost
+openstack_cidr: 10.0.0/16
 openstack_ip: 10.0.0.31
+openstack_controller_ip: 10.0.0.11
 
 openstack_rabbit_host: localhost
 openstack_rabbit_user: openstack

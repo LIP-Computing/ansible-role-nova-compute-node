@@ -1,0 +1,20 @@
+---
+- name: Install Neutron
+  yum: name={{ item }} state=latest
+  with_items:
+    - openstack-neutron
+    - openstack-neutron-ml2
+    - openstack-neutron-openvswitch
+    - python-neutronclient
+
+- name: Copy neutron template files
+  template: src={{ item.src }} dest={{ item.dest }} backup=yes
+  with_items:
+    - { src: 'neutron.conf.j2', dest: '/etc/neutron/neutron.conf' }
+    - { src: 'ml2_conf.ini.j2', dest: '/etc/neutron/plugins/ml2/ml2_conf.ini' }
+
+- name: Restart services
+  service: name={{ item }} enabled=yes state=restarted
+  with_items:
+    - openvswitch
+    - neutron-openvswitch-agent
