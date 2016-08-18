@@ -2,15 +2,17 @@
 # defaults file for ansible-role-nova-compute-node
 # rabbitmq variables
 openstack_version: "liberty"
-openstack_controller_host: localhost
+openstack_controller_host: controller
+openstack_compute_node_host: compute1
 openstack_cidr: 10.0.0/16
-openstack_ip: 10.0.0.31
+openstack_compute_node_ip: 10.0.0.31
 openstack_controller_ip: 10.0.0.11
 
-openstack_rabbit_host: localhost
+openstack_rabbit_host: {{ openstack_controller_host }}
 openstack_rabbit_user: openstack
 openstack_rabbit_pass: 12345
 
+openstack_admin_vip: {{ openstack_controller_host }}
 openstack_os_identity_api_version: "3"
 openstack_ath_uri: "http://{{ openstack_admin_vip }}:5000"
 openstack_ath_url: "http://{{ openstack_admin_vip }}:35357"
@@ -18,3 +20,5 @@ openstack_ath_url: "http://{{ openstack_admin_vip }}:35357"
 openstack_nova_keystone_password: "openstack"
 openstack_neutron_keystone_password: "openstack"
 openstack_keystone_auth_region: RegionOne
+
+openstack_neutron_endpoint: "http://{{ openstack_controller_host }}:9696"

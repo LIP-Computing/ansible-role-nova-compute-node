@@ -5,3 +5,9 @@
 
 # nova
 - include: compute_node.yml
+
+# neutron
+- include: neutron.yml
+
+#
+- include: firewall.yml

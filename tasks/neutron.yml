@@ -3,18 +3,23 @@
   yum: name={{ item }} state=latest
   with_items:
     - openstack-neutron
-    - openstack-neutron-ml2
-    - openstack-neutron-openvswitch
-    - python-neutronclient
+    - openstack-neutron-linuxbridge
+    - ebtables
+    - ipset
 
 - name: Copy neutron template files
   template: src={{ item.src }} dest={{ item.dest }} backup=yes
   with_items:
     - { src: 'neutron.conf.j2', dest: '/etc/neutron/neutron.conf' }
-    - { src: 'ml2_conf.ini.j2', dest: '/etc/neutron/plugins/ml2/ml2_conf.ini' }
+    #- { src: 'ml2_conf.ini.j2', dest: '/etc/neutron/plugins/ml2/ml2_conf.ini' }
+    - { src: 'linuxbridge_agent.ini.j2', dest: '/etc/neutron/plugins/ml2/linuxbridge_agent.ini' }
 
-- name: Restart services
-  service: name={{ item }} enabled=yes state=restarted
+- name: Start linuxbridge service
+  service: name={{ item }} enabled=yes state=started
   with_items:
-    - openvswitch
-    - neutron-openvswitch-agent
+    - neutron-linuxbridge-agent
+
+- name: Restart nova compute service
+  service: name={{ item }}state=restarted
+  with_items:
+    - openstack-nova-compute

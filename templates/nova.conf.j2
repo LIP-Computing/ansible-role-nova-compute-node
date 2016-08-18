@@ -2,7 +2,7 @@
 rpc_backend = rabbit
 auth_strategy = keystone
 
-my_ip = {{ openstack_ip }}
+my_ip = {{ openstack_compute_node_ip }}
 network_api_class = nova.network.neutronv2.api.API
 security_group_api = neutron
 linuxnet_interface_driver = nova.network.linux_net.NeutronLinuxBridgeInterfaceDriver
@@ -1937,7 +1937,7 @@ log_file=/var/log/nova/nova.log
 enabled = True
 vncserver_listen = 0.0.0.0
 vncserver_proxyclient_address = $my_ip
-novncproxy_base_url = {{openstack_controller_host}}:6080/vnc_auto.html
+novncproxy_base_url = http://{{openstack_controller_host}}:6080/vnc_auto.html
 
 [api_database]
 
@@ -3053,7 +3053,7 @@ password = {{ openstack_nova_keystone_password }}
 
 
 [neutron]
-url = http://{{ openstack_controller_host }}:9696
+url = {{ openstack_neutron_endpoint }}
 auth_url = {{ openstack_ath_url }}
 auth_plugin = password
 project_domain_id = default
