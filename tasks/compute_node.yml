@@ -13,7 +13,6 @@
   template: src={{ item.src }} dest={{ item.dest }} backup=yes
   with_items:
     - { src: 'nova.conf.j2', dest: '/etc/nova/nova.conf' }
-    - { src: 'neutron.conf.j2', dest: '/etc/neutron/neutron.conf' }
   notify: restart nova
 
 
@@ -21,9 +20,10 @@
   shell: egrep -c '(vmx|svm)' /proc/cpuinfo
   register: result
   run_once: True
+  ignore_errors: True
 
 - name: Configure libvirt to use QEMU instead of KVM
-  when: register.stdout == 0
+  when: result | failed
   lineinfile: >
     dest='/etc/nova/nova.conf'
     regexp="{{ item.regexp }}"
@@ -40,9 +40,6 @@
      - openstack-neutron-linuxbridge
      - ebtables
      - ipset
-
-- name: Give permissions to /var/log/nova/nova.log
-  file: path=/var/log/nova/nova.log state=touch mode=0640 owner=nova group=apache
 
 - name: Ensure nova service is started and enabled on boot.
   service: name={{ item }} enabled=yes state=started
