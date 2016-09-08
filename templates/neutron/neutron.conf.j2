@@ -1,0 +1,65 @@
+[DEFAULT]
+debug: True
+verbose = True
+core_plugin = ml2
+service_plugins = router
+allow_overlapping_ips = True
+rpc_backend = rabbit
+auth_strategy = keystone
+notify_nova_on_port_status_changes = True
+notify_nova_on_port_data_changes = True
+nova_url = {{ openstack_controller_host }}:8774/v2
+router_distributed = False
+bind_host = 0.0.0.0
+bind_port = 9696
+api_paste_config = /usr/share/neutron/api-paste.ini
+allow_overlapping_ips = True
+
+#only compute node
+nova_region_name = RegionOne
+nova_admin_username = nova
+nova_admin_password = openstack
+nova_admin_auth_url = {{ openstack_ath_url }}/v2
+#
+
+[matchmaker_redis]
+[matchmaker_ring]
+[quotas]
+quota_port = -1
+
+[agent]
+
+[keystone_authtoken]
+auth_uri = {{ openstack_ath_uri }}
+auth_url = {{ openstack_ath_url }}
+auth_plugin = password
+project_domain_id = default
+user_domain_id = default
+project_name = service
+username = neutron
+password = {{ openstack_neutron_keystone_password }}
+auth_version = v3
+
+[database]
+connection = mysql://neutron:{{ openstack_neutron_db_password }}@{{ openstack_database_host }}/neutron
+
+[nova]
+auth_url = {{ openstack_ath_url }}
+auth_plugin = password
+project_domain_id = default
+user_domain_id = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = {{ openstack_nova_keystone_password }}
+
+[oslo_concurrency]
+lock_path = $state_path/lock
+[oslo_policy]
+[oslo_messaging_amqp]
+[oslo_messaging_qpid]
+[oslo_messaging_rabbit]
+rabbit_host = {{ openstack_rabbit_host }}
+rabbit_userid = {{ openstack_rabbit_user }}
+rabbit_password = {{ openstack_rabbit_pass }}
+[qos]

@@ -1,0 +1,36 @@
+[DEFAULT]
+debug=True
+
+[ml2]
+type_drivers = flat,vxlan
+tenant_network_types = vxlan
+mechanism_drivers = openvswitch
+
+[ml2_type_flat]
+flat_networks = external
+
+[ml2_type_vxlan]
+vni_ranges = 1001:2000
+
+[securitygroup]
+enable_security_group = True
+
+####################
+# OVS
+
+[agent]
+tunnel_types = vxlan
+l2_population = False
+
+[ovs]
+enable_tunneling = True
+local_ip = {{ openstack_controller_ip }}
+bridge_mappings = external:br-ex
+
+[securitygroup]
+enable_security_group = True
+enable_ipset = False
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+
+
+

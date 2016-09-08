@@ -1,0 +1,24 @@
+---
+# configure the host name and add compute and controller hosts to /etc/hosts
+
+- name: Test {{ openstack_compute_node_host }} exist
+  shell: grep "^{{ openstack_compute_node_ip }}" /etc/hosts
+  register: test_exits
+
+- name: Append "{{ openstack_compute_node_host }}" to hosts file
+  when: test_grep.stdout != ""
+  lineinfile: dest=/etc/ansible/roles/ansible-role-os-controller/tests/hosts_docker
+              backup=True
+              backrefs=True
+              create=True
+              state=present
+              regexp='(^{{ openstack_compute_node_ip }}(\s+(?! {{ openstack_compute_node_ip }})[\w=/\-\.]+)*)\s*$'
+              line='\1 {{ openstack_compute_node_host }}'
+
+- name: Add "{{ openstack_compute_node_host }}" to hosts file
+  when: test_grep.stdout == ""
+  lineinfile: dest=/etc/hosts line="{{ openstack_compute_node_ip }} {{ openstack_compute_node_host }}"
+
+- name: Add "{{ openstack_controller_host }}" to hosts file
+  when: {{ openstack_controller_ip }} != {{ openstack_compute_node_ip }}
+  shell: echo "{{ openstack_controller_ip }} {{ openstack_controller_host }}" >> /etc/hosts

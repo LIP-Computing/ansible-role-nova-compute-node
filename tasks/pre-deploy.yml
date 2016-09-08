@@ -17,11 +17,6 @@
   with_items:
     - centos-release-openstack-{{ openstack_version | default(liberty) }}
 
-# todo(jorgesece): move to new role
 - name: Set hostame to "{{ openstack_compute_node_host }}"
   shell: hostnamectl set-hostname "{{ openstack_compute_node_host }}"
 
-- name: Copy host file
-  template: src={{ item.src }} dest={{ item.dest }} backup=yes
-  with_items:
-    - { src: 'hosts.j2', dest: '/etc/hosts'}

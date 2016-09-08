@@ -1,0 +1,97 @@
+[DEFAULT]
+rpc_backend = rabbit
+auth_strategy = keystone
+
+my_ip = {{ openstack_controller_ip }}
+network_api_class = nova.network.neutronv2.api.API
+security_group_api = neutron
+linuxnet_interface_driver = nova.network.linux_net.LinuxOVSInterfaceDriver
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+enabled_apis=osapi_compute,metadata
+verbose = True
+memcached_servers=localhost:11211
+state_path=/var/lib/nova
+ec2_listen=0.0.0.0
+ec2_listen_port=8773
+osapi_compute_listen=0.0.0.0
+osapi_compute_listen_port=8774
+metadata_listen=0.0.0.0
+metadata_listen_port=8775
+api_paste_config=nova-api-paste.ini
+novncproxy_host=0.0.0.0
+novncproxy_port=6080
+metadata_host=$my_ip
+metadata_port=8775
+log_file=/var/log/nova/nova.log
+vif_plugging_is_fatal= false
+vif_plugging_timeout= 0
+[vnc]
+vncserver_listen = 0.0.0.0
+vncserver_proxyclient_address = $my_ip
+enabled = True
+novncproxy_base_url = http://$my_ip:6080/vnc_auto.html
+[api_database]
+[barbican]
+[cells]
+[cinder]
+os_region_name = RegionOne
+[conductor]
+[database]
+connection = "mysql+pymysql://nova:{{ openstack_nova_db_password }}@{{ openstack_database_host }}/nova"
+[ephemeral_storage_encryption]
+[glance]
+host = {{ openstack_controller_host }}
+[guestfs]
+[hyperv]
+[image_file_url]
+[ironic]
+[keymgr]
+[keystone_authtoken]
+auth_uri = {{ openstack_ath_uri }}
+auth_url = {{ openstack_ath_url }}
+auth_plugin = password
+project_domain_id = default
+user_domain_id = default
+project_name = service
+username = nova
+password = {{ openstack_nova_keystone_password }}
+[libvirt]
+##virt_type=kvm  virt_type = qemu
+[metrics]
+[neutron]
+url = http://{{ openstack_controller_host }}:9696
+auth_url = {{ openstack_ath_url }}
+auth_plugin = password
+project_domain_id = default
+user_domain_id = default
+region_name = {{ openstack_keystone_auth_region }}
+project_name = service
+username = neutron
+password = {{ openstack_neutron_keystone_password }}
+
+service_metadata_proxy = True
+metadata_proxy_shared_secret = {{ openstack_neutron_metadata_secret }}
+[osapi_v3]
+[rdp]
+[serial_console]
+[spice]
+[ssl]
+[trusted_computing]
+[upgrade_levels]
+[vmware]
+[workarounds]
+[xenserver]
+[zookeeper]
+[matchmaker_redis]
+[matchmaker_ring]
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+[oslo_messaging_amqp]
+[oslo_messaging_qpid]
+[oslo_messaging_rabbit]
+rabbit_host = {{ openstack_rabbit_host }}
+rabbit_userid = {{ openstack_rabbit_user }}
+rabbit_password = {{ openstack_rabbit_pass }}
+rabbit_port = 5672
+
+rabbit_hosts=$rabbit_host:$rabbit_port
