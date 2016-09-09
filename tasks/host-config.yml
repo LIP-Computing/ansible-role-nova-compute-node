@@ -7,13 +7,15 @@
 - name: "Test {{ openstack_compute_node_ip }} exist in /etc/hosts"
   shell: grep "^{{ openstack_compute_node_ip }}" /etc/hosts
   register: ip_exits
+  ignore_errors: True
 
 - name: "Test {{ openstack_compute_node_host }} exist in /etc/hosts"
-  shell: grep "^{{ openstack_compute_node_host }}" /etc/hosts
+  shell: grep "{{ openstack_compute_node_host }}" /etc/hosts
   register: host_exits
+  ignore_errors: True
 
 - name: Append "{{ openstack_compute_node_host }}" to hosts file if ip exists
-  when: ()ip_exits.stdout != "") and (host_exits.stdout == "")
+  when: (ip_exits.stdout != "") and (host_exits.stdout == "")
   lineinfile: dest=/etc/hosts
               backup=True
               backrefs=True
@@ -27,5 +29,5 @@
   shell: echo "{{ openstack_compute_node_ip }} {{ openstack_compute_node_host }}" >> /etc/hosts
 
 - name: Add "{{ openstack_controller_host }}" to hosts file
-  when: ("{{ openstack_controller_ip }} != {{ openstack_compute_node_ip }}") and ("{{ openstack_controller_host }} != {{ openstack_compute_node_host }}")
+  when: not {{ openstack_all_in }}
   shell: echo "{{ openstack_controller_ip }} {{ openstack_controller_host }}" >> /etc/hosts

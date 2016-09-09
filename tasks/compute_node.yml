@@ -14,17 +14,13 @@
   run_once: True
   ignore_errors: True
 
-- name: Get nova.conf file state
-  stat: path=/etc/nova/nova.conf
-  register: file_state
-
 - name: Deploy nova configuration files from templates
   template: src={{ item.src }} dest={{ item.dest }} backup=yes
   with_items:
     - { src: 'nova/nova.conf.j2', dest: '/etc/nova/nova.conf' }
     - { src: 'nova/nova-api-paste.ini.j2', dest: '/etc/nova/nova-api-paste.ini'}
   notify: restart nova
-  when: file_state.stat.isreg is not defined
+  when: not {{ openstack_all_in }}
 
 - name: Configure libvirt to use QEMU instead of KVM
   when: result | failed
@@ -44,11 +40,6 @@
     state=present
   with_items:
     - { regexp: '^#\s*novncproxy_base_url', line: "novncproxy_base_url = http://{{openstack_controller_ip}}:6080/vnc_auto.html" }
-
-- name: Install network components
-  yum: name={{ item }} state=installed
-  with_items:
-     - openstack-neutron
 
 - name: Ensure nova service is started and enabled on boot.
   service: name={{ item }} enabled=yes state=restarted
