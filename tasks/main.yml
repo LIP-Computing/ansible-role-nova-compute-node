@@ -1,9 +1,9 @@
 ---
 # tasks file for ansible-role-nova-compute-node
 # Prepare deployment
-- include: pre-deploy.yml
+#- include: pre-deploy.yml
 
-- include: host-config.yml
+#- include: host-config.yml
 
 # nova
 - include: compute_node.yml

@@ -9,32 +9,19 @@
   register: test_exits
 
 - name: Append "{{ openstack_compute_node_host }}" to hosts file
-  when: test_grep.stdout != ""
-  lineinfile: dest=/etc/ansible/roles/ansible-role-os-controller/tests/hosts_docker
+  when: test_exits.stdout != ""
+  lineinfile: dest=/etc/hosts
               backup=True
               backrefs=True
-              create=True
               state=present
               regexp='(^{{ openstack_compute_node_ip }}(\s+(?! {{ openstack_compute_node_ip }})[\w=/\-\.]+)*)\s*$'
               line='\1 {{ openstack_compute_node_host }}'
 
+# improve the next to tasks
 - name: Add "{{ openstack_compute_node_ip }}" to hosts file
-  when: test_grep.stdout == ""
-  lineinfile: dest=/etc/hosts line="{{ openstack_compute_node_ip }} {{ openstack_compute_node_host }}"
+  when: test_exits.stdout == ""
+  shell: echo "{{ openstack_compute_node_ip }} {{ openstack_compute_node_host }}" >> /etc/hosts
 
 - name: Add "{{ openstack_controller_host }}" to hosts file
-  when: {{ openstack_controller_ip }} != {{ openstack_compute_node_ip }}
+  when: '"{{ openstack_controller_ip }} != {{ openstack_compute_node_ip }}"'
   shell: echo "{{ openstack_controller_ip }} {{ openstack_controller_host }}" >> /etc/hosts
-
-#SELINUX
-- name: Set Selinux in permissive mode
-  shell: setenforce 0
-
-- name: Persist in the configuration file the Selinux permissive mode.
-  lineinfile: >
-    dest=/etc/sysconfig/selinux
-    regexp="{{ item.regexp }}"
-    line="{{ item.line }}"
-    state=present
-  with_items:
-    - { regexp: "^SELINUX=", line: "SELINUX=disable" }
