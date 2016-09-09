@@ -1,6 +1,6 @@
 ---
 - name: Install Neutron
-  yum: name={{ item }} state=latest
+  yum: name={{ item }} state=installed
   with_items:
     - openstack-neutron
     - openstack-neutron-ml2
@@ -75,10 +75,10 @@
     line="{{ item.line }}"
     state=present
   with_items:
-    - { regexp: "^#?nova_region_name", line: "nova_region_name = {{ openstack_keystone_auth_region }}" }
-    - { regexp: "^#?nova_admin_username", line: "nova_admin_username = nova" }
-    - { regexp: "^#?nova_admin_password", line: "nova_admin_password = {{ openstack_nova_keystone_password }}" }
-    - { regexp: "^#?nova_admin_auth_url", line: "nova_admin_username = {{ openstack_ath_url }}/v2" }
+    - { regexp: '^#\s*nova_region_name', line: "nova_region_name = {{ openstack_keystone_auth_region }}" }
+    - { regexp: '^#\s*nova_admin_username', line: "nova_admin_username = nova" }
+    - { regexp: '^#\s*nova_admin_auth_url', line: "nova_admin_auth_url = {{ openstack_ath_url }}/v2" }
+    - { regexp: '^#\s*nova_admin_password', line: "nova_admin_password = {{ openstack_nova_keystone_password }}" }
   when: openvswitch_conf_state.stat.isreg is defined
 
 - name: Configure openvswitch_agent.ini if ml2_conf exists.
@@ -88,7 +88,7 @@
     line="{{ item.line }}"
     state=present
   with_items:
-    - { regexp: "^#?bridge_mappings", line: "bridge_mappings = external:{{ openstack_neutron_bridge_interface }}" }
+    - { regexp: '^#\s*bridge_mappings', line: "bridge_mappings = external:{{ openstack_neutron_bridge_interface }}" }
   when: openvswitch_conf_state.stat.isreg is defined
 
 - name: Start neutron services
@@ -101,3 +101,12 @@
   service: name={{ item }} state=restarted
   with_items:
     - openstack-nova-compute
+
+- name: Ensure neutron service if compute node and controller in the same server.
+  service: name={{ item }} enabled=yes state=restarted
+  when: '"{{ openstack_controller_ip }} == {{ openstack_compute_node_ip }}"'
+  with_items:
+    - neutron-server
+    - neutron-l3-agent
+    - neutron-dhcp-agent
+    - neutron-metadata-agent

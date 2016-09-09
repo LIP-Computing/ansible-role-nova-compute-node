@@ -1,15 +1,19 @@
 ---
 # configure the host name and add compute and controller hosts to /etc/hosts
 - name: Set hostame to "{{ openstack_compute_node_host }}"
-  shell: hostnamectl set-hostname "{{ openstack_compute_node_host }}"
+  shell: hostnamectl set-hostname {{ openstack_compute_node_host }}
   ignore_errors: True
 
-- name: Test {{ openstack_compute_node_host }} exist
+- name: "Test {{ openstack_compute_node_ip }} exist in /etc/hosts"
   shell: grep "^{{ openstack_compute_node_ip }}" /etc/hosts
-  register: test_exits
+  register: ip_exits
 
-- name: Append "{{ openstack_compute_node_host }}" to hosts file
-  when: test_exits.stdout != ""
+- name: "Test {{ openstack_compute_node_host }} exist in /etc/hosts"
+  shell: grep "^{{ openstack_compute_node_host }}" /etc/hosts
+  register: host_exits
+
+- name: Append "{{ openstack_compute_node_host }}" to hosts file if ip exists
+  when: ()ip_exits.stdout != "") and (host_exits.stdout == "")
   lineinfile: dest=/etc/hosts
               backup=True
               backrefs=True
@@ -18,10 +22,10 @@
               line='\1 {{ openstack_compute_node_host }}'
 
 # improve the next to tasks
-- name: Add "{{ openstack_compute_node_ip }}" to hosts file
-  when: test_exits.stdout == ""
+- name: Add "{{ openstack_compute_node_ip }}" to hosts file if ip does not exist
+  when: (ip_exits.stdout == "") and (host_exits.stdout == "")
   shell: echo "{{ openstack_compute_node_ip }} {{ openstack_compute_node_host }}" >> /etc/hosts
 
 - name: Add "{{ openstack_controller_host }}" to hosts file
-  when: '"{{ openstack_controller_ip }} != {{ openstack_compute_node_ip }}"'
+  when: ("{{ openstack_controller_ip }} != {{ openstack_compute_node_ip }}") and ("{{ openstack_controller_host }} != {{ openstack_compute_node_host }}")
   shell: echo "{{ openstack_controller_ip }} {{ openstack_controller_host }}" >> /etc/hosts

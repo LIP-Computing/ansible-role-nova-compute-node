@@ -34,7 +34,7 @@
     line="{{ item.line }}"
     state=present
   with_items:
-    - { regexp: "^#?virt_type", line: "virt_type = qemu" }
+    - { regexp: '^#\s*virt_type', line: "virt_type = qemu" }
 
 - name: Configure compute node in nova.conf
   lineinfile: >
@@ -43,7 +43,7 @@
     line="{{ item.line }}"
     state=present
   with_items:
-    - { regexp: "^#?novncproxy_base_url", line: "novncproxy_base_url = http://{{openstack_controller_ip}}:6080/vnc_auto.html" }
+    - { regexp: '^#\s*novncproxy_base_url', line: "novncproxy_base_url = http://{{openstack_controller_ip}}:6080/vnc_auto.html" }
 
 - name: Install network components
   yum: name={{ item }} state=installed

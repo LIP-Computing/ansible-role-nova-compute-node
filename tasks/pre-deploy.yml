@@ -1,11 +1,11 @@
 ---
 # Pre deployment tasks
 
-#- name: Install required packages
-#  yum: name="{{ item }}" state=latest
-#  with_items:
-#    - iptables
-#    - iptables-services
+- name: Install required packages
+  yum: name="{{ item }}" state=latest
+  with_items:
+    - iptables
+    - iptables-services
 
 - name: Install yum-plugin-priorities and epel-release
   yum: name="{{ item }}" state=latest
@@ -17,6 +17,4 @@
   with_items:
     - centos-release-openstack-{{ openstack_version | default(liberty) }}
 
-- name: Set hostame to "{{ openstack_compute_node_host }}"
-  shell: hostnamectl set-hostname "{{ openstack_compute_node_host }}"
 
