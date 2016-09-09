@@ -22,3 +22,7 @@ openstack_neutron_keystone_password: "openstack"
 openstack_keystone_auth_region: RegionOne
 
 openstack_neutron_endpoint: "http://{{ openstack_controller_host }}:9696"
+
+openstack_neutron_public_interface: "eth0"
+openstack_neutron_bridge_interface: "br-ex"
+

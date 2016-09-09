@@ -1,5 +1,8 @@
 ---
 # configure the host name and add compute and controller hosts to /etc/hosts
+- name: Set hostame to "{{ openstack_compute_node_host }}"
+  shell: hostnamectl set-hostname "{{ openstack_compute_node_host }}"
+  ignore_errors: True
 
 - name: Test {{ openstack_compute_node_host }} exist
   shell: grep "^{{ openstack_compute_node_ip }}" /etc/hosts
@@ -15,10 +18,23 @@
               regexp='(^{{ openstack_compute_node_ip }}(\s+(?! {{ openstack_compute_node_ip }})[\w=/\-\.]+)*)\s*$'
               line='\1 {{ openstack_compute_node_host }}'
 
-- name: Add "{{ openstack_compute_node_host }}" to hosts file
+- name: Add "{{ openstack_compute_node_ip }}" to hosts file
   when: test_grep.stdout == ""
   lineinfile: dest=/etc/hosts line="{{ openstack_compute_node_ip }} {{ openstack_compute_node_host }}"
 
 - name: Add "{{ openstack_controller_host }}" to hosts file
   when: {{ openstack_controller_ip }} != {{ openstack_compute_node_ip }}
   shell: echo "{{ openstack_controller_ip }} {{ openstack_controller_host }}" >> /etc/hosts
+
+#SELINUX
+- name: Set Selinux in permissive mode
+  shell: setenforce 0
+
+- name: Persist in the configuration file the Selinux permissive mode.
+  lineinfile: >
+    dest=/etc/sysconfig/selinux
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: "^SELINUX=", line: "SELINUX=disable" }

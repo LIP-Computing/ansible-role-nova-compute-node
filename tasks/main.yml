@@ -3,7 +3,7 @@
 # Prepare deployment
 - include: pre-deploy.yml
 
-- include: host_config.yml
+- include: host-config.yml
 
 # nova
 - include: compute_node.yml

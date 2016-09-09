@@ -3,7 +3,8 @@
   yum: name={{ item }} state=latest
   with_items:
     - openstack-neutron
-    - openstack-neutron-linuxbridge
+    - openstack-neutron-ml2
+    - openstack-neutron-openvswitch
     - ebtables
     - ipset
 
@@ -57,20 +58,46 @@
     - { src: 'neutron/metadata_agent.ini.j2', dest: '/etc/neutron/metadata_agent.ini' }
   when: neutron_conf_state.stat.isreg is not defined
 
-#  in ml2:
-#   bridge_mappings = external:br-ex
-#  in neutron:
-#  nova_region_name = RegionOne
-#nova_admin_username = nova
-#nova_admin_password = openstack
-#nova_admin_auth_url = {{ openstack_ath_url }}/v2
+- name: Check if openvswitch_agent.conf file already exist
+  stat: path=/etc/neutron/plugins/ml2/openvswitch_agent.ini
+  register: openvswitch_conf_state
 
-- name: Start linuxbridge service
-  service: name={{ item }} enabled=yes state=started
+- name: Deploy openvswitch_agent configuration file from templates
+  template: src={{ item.src }} dest={{ item.dest }} mode=0640 owner=root group=neutron backup=yes
   with_items:
-    - neutron-linuxbridge-agent
+    - { src: 'neutron/openvswitch_agent.ini.j2', dest: '/etc/neutron/plugins/ml2/openvswitch_agent.ini' }
+  when: openvswitch_conf_state.stat.isreg is not defined
+
+- name: Configure neutron if neutron exists.
+  lineinfile: >
+    dest=/etc/neutron/neutron.conf
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: "^#?nova_region_name", line: "nova_region_name = {{ openstack_keystone_auth_region }}" }
+    - { regexp: "^#?nova_admin_username", line: "nova_admin_username = nova" }
+    - { regexp: "^#?nova_admin_password", line: "nova_admin_password = {{ openstack_nova_keystone_password }}" }
+    - { regexp: "^#?nova_admin_auth_url", line: "nova_admin_username = {{ openstack_ath_url }}/v2" }
+  when: openvswitch_conf_state.stat.isreg is defined
+
+- name: Configure openvswitch_agent.ini if ml2_conf exists.
+  lineinfile: >
+    dest=/etc/neutron/plugins/ml2/openvswitch_agent.ini
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: "^#?bridge_mappings", line: "bridge_mappings = external:{{ openstack_neutron_bridge_interface }}" }
+  when: openvswitch_conf_state.stat.isreg is defined
+
+- name: Start neutron services
+  service: name={{ item }} enabled=yes state=restarted
+  with_items:
+    - openvswitch
+    - neutron-openvswitch-agent
 
 - name: Restart nova compute service
-  service: name={{ item }}state=restarted
+  service: name={{ item }} state=restarted
   with_items:
     - openstack-nova-compute
