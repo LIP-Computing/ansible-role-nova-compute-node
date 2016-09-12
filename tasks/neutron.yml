@@ -1,7 +1,7 @@
 ---
 - name: Install Neutron
   yum: name={{ item }} state=lastest
-  when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
   with_items:
     - openstack-neutron
     - openstack-neutron-ml2
@@ -13,37 +13,37 @@
   template: src={{ item.src }} dest={{ item.dest }} backup=yes
   with_items:
     - { src: 'neutron.conf.j2', dest: '/etc/neutron/neutron.conf' }
-  when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
 
 - name: Deploy ml2_conf configuration file from templates
   template: src={{ item.src }} dest={{ item.dest }} mode=0640 owner=root group=neutron backup=yes
   with_items:
     - { src: 'neutron/ml2_conf.ini.j2', dest: '/etc/neutron/plugins/ml2/ml2_conf.ini' }
-  when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
 
 - name: Deploy l3_agent configuration file from templates
   template: src={{ item.src }} dest={{ item.dest }} mode=0640 owner=root group=neutron backup=yes
   with_items:
     - { src: 'neutron/l3_agent.ini.j2', dest: '/etc/neutron/l3_agent.ini' }
-  when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
 
 - name: Deploy dhcp_agent configuration file from templates
   template: src={{ item.src }} dest={{ item.dest }} mode=0640 owner=root group=neutron backup=yes
   with_items:
     - { src: 'neutron/dhcp_agent.ini.j2', dest: '/etc/neutron/dhcp_agent.ini' }
-  when: when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
 
 - name: Deploy metadata_agent configuration file from templates
   template: src={{ item.src }} dest={{ item.dest }} mode=0640 owner=root group=neutron backup=yes
   with_items:
     - { src: 'neutron/metadata_agent.ini.j2', dest: '/etc/neutron/metadata_agent.ini' }
-  when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
 
 - name: Deploy openvswitch_agent configuration file from templates
   template: src={{ item.src }} dest={{ item.dest }} mode=0640 owner=root group=neutron backup=yes
   with_items:
     - { src: 'neutron/openvswitch_agent.ini.j2', dest: '/etc/neutron/plugins/ml2/openvswitch_agent.ini' }
-  when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
 
 - name: Configure neutron if neutron exists.
   lineinfile: >
@@ -56,7 +56,7 @@
     - { regexp: '^#\s*nova_admin_username', line: "nova_admin_username = nova" }
     - { regexp: '^#\s*nova_admin_auth_url', line: "nova_admin_auth_url = {{ openstack_ath_url }}/v2" }
     - { regexp: '^#\s*nova_admin_password', line: "nova_admin_password = {{ openstack_nova_keystone_password }}" }
-  when: {{ openstack_all_in }}
+  when: "{{ openstack_all_in }}"
 
 - name: Configure openvswitch_agent.ini if ml2_conf exists.
   lineinfile: >
@@ -66,7 +66,7 @@
     state=present
   with_items:
     - { regexp: '^#\s*bridge_mappings', line: "bridge_mappings = external:{{ openstack_neutron_bridge_interface }}" }
-  when: {{ openstack_all_in }}
+  when: "{{ openstack_all_in }}"
 
 - name: Start neutron services
   service: name={{ item }} enabled=yes state=restarted

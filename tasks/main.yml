@@ -1,9 +1,11 @@
 ---
 # tasks file for ansible-role-nova-compute-node
 # Prepare deployment
-#- include: pre-deploy.yml
+- include: pre-deploy.yml
+  when: not "{{ openstack_all_in }}"
 
 - include: host-config.yml
+  when: not "{{ openstack_all_in }}"
 
 # nova
 - include: compute_node.yml
@@ -13,3 +15,4 @@
 
 #
 - include: firewall.yml
+  when: not "{{ openstack_all_in }}"

@@ -20,7 +20,7 @@
     - { src: 'nova/nova.conf.j2', dest: '/etc/nova/nova.conf' }
     - { src: 'nova/nova-api-paste.ini.j2', dest: '/etc/nova/nova-api-paste.ini'}
   notify: restart nova
-  when: not {{ openstack_all_in }}
+  when: not "{{ openstack_all_in }}"
 
 - name: Configure libvirt to use QEMU instead of KVM
   when: result | failed

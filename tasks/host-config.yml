@@ -29,5 +29,4 @@
   shell: echo "{{ openstack_compute_node_ip }} {{ openstack_compute_node_host }}" >> /etc/hosts
 
 - name: Add "{{ openstack_controller_host }}" to hosts file
-  when: not {{ openstack_all_in }}
   shell: echo "{{ openstack_controller_ip }} {{ openstack_controller_host }}" >> /etc/hosts
