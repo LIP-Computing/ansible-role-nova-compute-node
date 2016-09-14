@@ -1,5 +1,11 @@
 ---
 - hosts: localhost
-  remote_user: root
+  vars:
+    openstack_version: "liberty"
+    openstack_controller_host: localhost
+    openstack_compute_node_ip: 127.0.0.1
+    openstack_controller_ip: 127.0.0.1
+    openstack_all_in: True
+
   roles:
-    - nova-compute-node
+    - LIP-Computing.nova-compute-node
