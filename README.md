@@ -1,38 +1,65 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+This role install and configure a openstack nova compute node. This role allows  make a all-in installation,
+so that, it installs the compute node in a machine with an openstack controller installation (installing LIP-Computing.os-controller).
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role installs authomatically the openstack centos packages:
+ - centos-release-liberty
+ - centos-release-qemu-ev
+ - centos-release-ovirt36
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+* openstack_all_in: It indicates installation all-in (controller and compute node in same host). If true it will make a minimal installation, because the host
+has already installed most of the packages.
+* openstack_version: "liberty" version is supported
+* openstack_controller_host: controller hostname
+* openstack_compute_node_host: compute node hostname
+* openstack_cidr: openstack internal network CIDR
+* openstack_compute_node_ip: controller ip
+* openstack_controller_ip: compute node ip (can be the same as controller in all-in installation)
 
-Dependencies
-------------
+* openstack_rabbit_host: rabbit host name
+* openstack_rabbit_user: rabbit username
+* openstack_rabbit_pass: rabbit password
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+* openstack_admin_vip: administration host (could be openstack_controller_host in in all-in installation)
+* openstack_os_identity_api_version: openstack identification api version
+* openstack_ath_uri: public openstack authentication uri
+* openstack_ath_url: internal openstack authentication url
+
+* openstack_nova_keystone_password: keystone password for nova user.
+* openstack_neutron_keystone_password: keystone password for neutron user
+* openstack_keystone_auth_region: authentication region (RegionOne)
+
+* openstack_neutron_bridge_interface: openvswitch external bridge (br-ex)
+
 
 Example Playbook
 ----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
+This is an example of all-in installation. We install the compute node in a machine with openstack controller installed.
+    - hosts: localhost
+      var:
+       openstack_version: "liberty"
+       openstack_controller_host: localhost
+       openstack_compute_node_ip: 127.0.0.1
+       openstack_controller_ip: 127.0.0.1
+       penstack_cidr: 127.0.0.0/8
+       openstack_all_in: True
       roles:
-         - { role: username.rolename, x: 42 }
+        - LIP-Computing.nova-compute-node
 
 License
 -------
 
-BSD
+Apache 2.0
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Contact: jorgesece@lip.pt

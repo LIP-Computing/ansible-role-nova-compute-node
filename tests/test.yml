@@ -6,6 +6,7 @@
     openstack_compute_node_ip: 127.0.0.1
     openstack_controller_ip: 127.0.0.1
     openstack_all_in: True
+    openstack_cidr: 127.0.0.0/8
 
   roles:
     - LIP-Computing.nova-compute-node
