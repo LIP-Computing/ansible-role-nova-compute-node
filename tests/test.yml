@@ -2,7 +2,8 @@
 - hosts: localhost
   vars:
     openstack_version: "liberty"
-    openstack_controller_host: localhost
+    openstack_controller_host: controller
+    openstack_compute_node_host: controller
     openstack_compute_node_ip: 127.0.0.1
     openstack_controller_ip: 127.0.0.1
     openstack_all_in: True
