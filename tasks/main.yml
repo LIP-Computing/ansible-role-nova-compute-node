@@ -10,6 +10,9 @@
 # nova
 - include: compute_node.yml
 
+- include: nova-docker.yml
+  when: "{{ openstack_nova_docker }}"
+
 # neutron
 - include: neutron.yml
 

@@ -1,0 +1,57 @@
+---
+# tasks file for nova-docker
+
+# Install
+
+- name: Install docker engine.
+  shell: curl -fsSL https://get.docker.com/ | sh
+
+- name: Ensure docker service is started and enabled on boot.
+  service: name={{ item }} enabled=yes state=restarted
+  with_items:
+    - docker
+
+- name: Give add nova user to docker
+  shell: usermod -aG docker nova
+
+- name: Install indigo repository
+  yum: name=http://repo.indigo-datacloud.eu/repository/indigo/1/centos7/x86_64/base/indigodc-release-1.0.0-1.el7.centos.noarch.rpm state=present
+
+
+- name: Install nova-docker package.
+  yum: name={{ item }} state=latest
+  with_items:
+    - python-nova-docker
+
+- name: Create /etc/nova/rootwrap.d
+  file: path=/etc/nova/rootwrap.d state=directory mode=0755
+
+- name: Deploy nova configuration files from templates
+  template: src={{ item.src }} dest={{ item.dest }} backup=yes
+  with_items:
+    - { src: 'nova/docker.filters.j2', dest: '/etc/nova/rootwrap.d/docker.filters' }
+
+- name: Configure libvirt to use QEMU instead of KVM
+  lineinfile: >
+    dest='/etc/nova/nova.conf'
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: '^#?compute_driver', line: "compute_driver = novadocker.virt.docker.DockerDriver" }
+
+- name: Configure libvirt to use QEMU instead of KVM
+  lineinfile: >
+    dest='/etc/glance/glance-api.conf'
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: '^#?container_formats', line: "container_formats=ami,ari,aki,bare,ovf,ova,docker" }
+
+- name: Ensure nova service is started and enabled on boot.
+  service: name={{ item }} enabled=yes state=restarted
+  with_items:
+    - openstack-nova-compute
+    - openstack-glance-api
+    - openstack-glance-registry

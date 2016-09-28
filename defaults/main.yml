@@ -24,3 +24,5 @@ openstack_keystone_auth_region: RegionOne
 
 openstack_neutron_bridge_interface: "br-ex"
 openstack_all_in: True
+
+openstack_nova_docker: False
